@@ -8,6 +8,9 @@ var app = express();
 // process.env.PORT lets the port be set by Heroku
 var PORT = process.env.PORT || 8080;
 
+//Require Models for syncing
+var db = require("./models");
+
 // Sets up the Express app to handle data parsing
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -16,10 +19,10 @@ app.use(express.json());
 app.use(express.static("public"));
 
 // Import routes and give the server access to them.
-var routes = require("./controllers/burgersController.js");
+require("./controllers/burgersController.js")(app);
 
-app.use(routes);
-
-app.listen(PORT, function() {
-  console.log("Listening on port:%s", PORT);
+db.sequelize.sync({force: true}).then(function(){
+  app.listen(PORT,function(){
+    console.log("App listening on PORT " + PORT);
+  });
 });
